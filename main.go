@@ -1,22 +1,22 @@
 package main
 
 import (
-  "net/http"
-  "fmt"
+	"context"
+	"fmt"
+	"os"
+	"os/signal"
+
+	"github.com/MalickSidi/micro/application"
 )
 
 func main() {
-  server := &http.Server {
+	app := application.New()
 
-    Addr: ":3000",
-    Handler: http.HandlerFunc(basicHandler),
-  }
-  err := server.ListenAndServe()
-  if err != nil {
-    fmt.Println("faild to listen to server", err)
-  }
-}
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
 
-func basicHandler(w http.ResponseWriter, r *http.Request) {
-  w.Write([]byte("Testing http, everything is alright?"))
+	err := app.Start(ctx)
+	if err != nil {
+		fmt.Println("Faild to start Server:", err)
+	}
 }
